@@ -18,7 +18,6 @@ const s = StyleSheet.create({
 export default class CCInput extends Component {
   static propTypes = {
     field: PropTypes.string.isRequired,
-    label: PropTypes.string,
     value: PropTypes.string,
     placeholder: PropTypes.string,
     keyboardType: PropTypes.string,
@@ -27,7 +26,6 @@ export default class CCInput extends Component {
 
     containerStyle: ViewPropTypes.style,
     inputStyle: Text.propTypes.style,
-    labelStyle: Text.propTypes.style,
     validColor: PropTypes.string,
     invalidColor: PropTypes.string,
     placeholderColor: PropTypes.string,
@@ -40,12 +38,10 @@ export default class CCInput extends Component {
   };
 
   static defaultProps = {
-    label: "",
     value: "",
     status: "incomplete",
     containerStyle: {},
     inputStyle: {},
-    labelStyle: {},
     onFocus: () => {},
     onChange: () => {},
     onBecomeEmpty: () => {},
@@ -67,15 +63,14 @@ export default class CCInput extends Component {
   _onChange = value => this.props.onChange(this.props.field, value);
 
   render() {
-    const { label, value, placeholder, status, keyboardType,
-            containerStyle, inputStyle, labelStyle,
+    const { value, placeholder, status, keyboardType,
+            containerStyle, inputStyle,
             validColor, invalidColor, placeholderColor,
             additionalInputProps } = this.props;
     return (
       <TouchableOpacity onPress={this.focus}
         activeOpacity={0.99}>
         <View style={[containerStyle]}>
-          { !!label && <Text style={[labelStyle]}>{label}</Text>}
           <TextInput ref="input"
             {...additionalInputProps}
             keyboardType={keyboardType}

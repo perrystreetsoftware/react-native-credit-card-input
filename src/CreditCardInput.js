@@ -1,29 +1,22 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import ReactNative, {
-  NativeModules,
+import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  Dimensions,
   TextInput,
   ViewPropTypes,
 } from "react-native";
-
-import CreditCard from "./CardView";
 import CCInput from "./CCInput";
 import { InjectedProps } from "./connectToState";
 
 const s = StyleSheet.create({
   container: {
     alignItems: "center",
-  },
-  form: {
-    marginTop: 20,
+    padding: 20,
   },
   inputContainer: {
-    marginLeft: 20,
+
   },
   inputLabel: {
     fontWeight: "bold",
@@ -32,14 +25,6 @@ const s = StyleSheet.create({
     height: 40,
   },
 });
-
-const CVC_INPUT_WIDTH = 70;
-const EXPIRY_INPUT_WIDTH = CVC_INPUT_WIDTH;
-const CARD_NUMBER_INPUT_WIDTH_OFFSET = 40;
-const CARD_NUMBER_INPUT_WIDTH = Dimensions.get("window").width - EXPIRY_INPUT_WIDTH - CARD_NUMBER_INPUT_WIDTH_OFFSET;
-const NAME_INPUT_WIDTH = CARD_NUMBER_INPUT_WIDTH;
-const PREVIOUS_FIELD_OFFSET = 40;
-const POSTAL_CODE_INPUT_WIDTH = 120;
 
 /* eslint react/prop-types: 0 */ // https://github.com/yannickcr/eslint-plugin-react/issues/106
 export default class CreditCardInput extends Component {
@@ -56,41 +41,36 @@ export default class CreditCardInput extends Component {
     invalidColor: PropTypes.string,
     placeholderColor: PropTypes.string,
 
-    cardImageFront: PropTypes.number,
-    cardImageBack: PropTypes.number,
-    cardScale: PropTypes.number,
-    cardFontFamily: PropTypes.string,
-    cardBrandIcons: PropTypes.object,
+    cardLabel: PropTypes.string,
+    nameLabel: PropTypes.string,
+    regionLabel: PropTypes.string,
 
-    allowScroll: PropTypes.bool,
+    requireName: PropTypes.bool,
+    requiresPostalCode: PropTypes.bool,
+    requiresCVC: PropTypes.bool,
 
     additionalInputsProps: PropTypes.objectOf(PropTypes.shape(TextInput.propTypes)),
   };
 
   static defaultProps = {
-    cardViewSize: {},
-    labels: {
-      name: "CARDHOLDER'S NAME",
-      number: "CARD NUMBER",
-      expiry: "EXPIRY",
-      cvc: "CVC/CCV",
-      postalCode: "POSTAL CODE",
-    },
     placeholders: {
       name: "Full Name",
-      number: "1234 5678 1234 5678",
+      number: "1234 5678 9123 4567",
       expiry: "MM/YY",
       cvc: "CVC",
-      postalCode: "34567",
+      postalCode: "10001",
     },
     inputContainerStyle: {
-      borderBottomWidth: 1,
-      borderBottomColor: "black",
+      borderColor: "white"
     },
     validColor: "",
     invalidColor: "red",
     placeholderColor: "gray",
-    allowScroll: false,
+    cardLabel: "Card information",
+    nameLabel: "Name on card",
+    regionLabel: "Country or region",
+    requireName: false,
+    requiresPostalCode: false,
     additionalInputsProps: {},
   };
 
@@ -102,33 +82,22 @@ export default class CreditCardInput extends Component {
 
   _focus = field => {
     if (!field) return;
-
-    const scrollResponder = this.refs.Form.getScrollResponder();
-    const nodeHandle = ReactNative.findNodeHandle(this.refs[field]);
-
-    NativeModules.UIManager.measureLayoutRelativeToParent(nodeHandle,
-      e => { throw e; },
-      x => {
-        scrollResponder.scrollTo({ x: Math.max(x - PREVIOUS_FIELD_OFFSET, 0), animated: true });
-        this.refs[field].focus();
-      });
+    this.refs[field].focus();
   }
 
   _inputProps = field => {
     const {
-      inputStyle, labelStyle, validColor, invalidColor, placeholderColor,
-      placeholders, labels, values, status,
+      inputStyle, validColor, invalidColor, placeholderColor,
+      placeholders, values, status,
       onFocus, onChange, onBecomeEmpty, onBecomeValid,
       additionalInputsProps,
     } = this.props;
 
     return {
       inputStyle: [s.input, inputStyle],
-      labelStyle: [s.inputLabel, labelStyle],
       validColor, invalidColor, placeholderColor,
       ref: field, field,
 
-      label: labels[field],
       placeholder: placeholders[field],
       value: values[field],
       status: status[field],
@@ -141,49 +110,78 @@ export default class CreditCardInput extends Component {
 
   render() {
     const {
-      cardImageFront, cardImageBack, inputContainerStyle,
-      values: { number, expiry, cvc, name, type }, focused,
-      allowScroll, requiresName, requiresCVC, requiresPostalCode,
-      cardScale, cardFontFamily, cardBrandIcons,
+      inputContainerStyle, labelStyle, cardLabel, nameLabel, regionLabel, requiresName, requiresPostalCode, requiresCVC
     } = this.props;
 
     return (
       <View style={s.container}>
-        <CreditCard focused={focused}
-          brand={type}
-          scale={cardScale}
-          fontFamily={cardFontFamily}
-          imageFront={cardImageFront}
-          imageBack={cardImageBack}
-          customIcons={cardBrandIcons}
-          name={requiresName ? name : " "}
-          number={number}
-          expiry={expiry}
-          cvc={cvc} />
-        <ScrollView ref="Form"
-          horizontal
-          keyboardShouldPersistTaps="always"
-          scrollEnabled={allowScroll}
-          showsHorizontalScrollIndicator={false}
-          style={s.form}>
-          <CCInput {...this._inputProps("number")}
-            keyboardType="numeric"
-            containerStyle={[s.inputContainer, inputContainerStyle, { width: CARD_NUMBER_INPUT_WIDTH }]} />
-          <CCInput {...this._inputProps("expiry")}
-            keyboardType="numeric"
-            containerStyle={[s.inputContainer, inputContainerStyle, { width: EXPIRY_INPUT_WIDTH }]} />
-          { requiresCVC &&
-            <CCInput {...this._inputProps("cvc")}
+        <View
+          style={{
+            width: '100%',
+            marginBottom: 8,
+          }}
+        >
+          <Text style={labelStyle}>
+            {cardLabel}
+          </Text>
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: 'white',
+              borderRadius: 5,
+            }}
+          >
+            <CCInput {...this._inputProps("number")}
               keyboardType="numeric"
-              containerStyle={[s.inputContainer, inputContainerStyle, { width: CVC_INPUT_WIDTH }]} /> }
-          { requiresName &&
+              containerStyle={[s.inputContainer, inputContainerStyle, {borderBottomWidth: 1}]} />
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+              }}
+            >
+              <View style={{flex: 1}}>
+                <CCInput {...this._inputProps("expiry")}
+                  keyboardType="numeric"
+                  containerStyle={[s.inputContainer, inputContainerStyle, {borderRightWidth: 1}]} />
+              </View>
+              { requiresCVC &&
+                <View style={{flex: 1}}>
+                  <CCInput {...this._inputProps("cvc")}
+                    keyboardType="numeric"
+                    containerStyle={[s.inputContainer, inputContainerStyle]} />
+                </View>
+              }
+            </View>
+          </View>
+        </View>
+        { requiresName &&
+          <View
+            style={{
+              width: '100%',
+              marginBottom: 8,
+            }}
+          >
+            <Text style={labelStyle}>
+              {nameLabel}
+            </Text>
             <CCInput {...this._inputProps("name")}
-              containerStyle={[s.inputContainer, inputContainerStyle, { width: NAME_INPUT_WIDTH }]} /> }
-          { requiresPostalCode &&
+              keyboardType="default"
+              containerStyle={[s.inputContainer, inputContainerStyle, { borderWidth: 1, borderRadius: 5}]} />
+          </View> }
+        { requiresPostalCode &&
+          <View
+            style={{
+              width: '100%',
+            }}
+          >
+            <Text style={labelStyle}>
+              {regionLabel}
+            </Text>
             <CCInput {...this._inputProps("postalCode")}
-              keyboardType="numeric"
-              containerStyle={[s.inputContainer, inputContainerStyle, { width: POSTAL_CODE_INPUT_WIDTH }]} /> }
-        </ScrollView>
+              keyboardType="default"
+              containerStyle={[s.inputContainer, inputContainerStyle, { borderWidth: 1, borderRadius: 5}]} />
+          </View> }
       </View>
     );
   }
