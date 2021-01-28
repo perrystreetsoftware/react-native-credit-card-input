@@ -8,13 +8,14 @@ import {
   LayoutAnimation,
   TouchableOpacity,
   TextInput,
+  Dimensions,
 } from "react-native";
 
 import Icons from "./Icons";
 import CCInput from "./CCInput";
 import { InjectedProps } from "./connectToState";
 
-const INFINITE_WIDTH = 1000;
+const INFINITE_WIDTH = Dimensions.get("window").width / 1.5;
 
 const s = StyleSheet.create({
   container: {
