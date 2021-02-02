@@ -34,6 +34,7 @@ export default class CCInput extends Component {
     onChange: PropTypes.func,
     onBecomeEmpty: PropTypes.func,
     onBecomeValid: PropTypes.func,
+    onSubmitEditing: PropTypes.func,
     additionalInputProps: PropTypes.shape(TextInput.propTypes),
   };
 
@@ -66,7 +67,7 @@ export default class CCInput extends Component {
     const { value, placeholder, status, keyboardType,
             containerStyle, inputStyle,
             validColor, invalidColor, placeholderColor,
-            additionalInputProps } = this.props;
+            additionalInputProps, onSubmitEditing } = this.props;
     return (
       <TouchableOpacity onPress={this.focus}
         activeOpacity={0.99}>
@@ -87,6 +88,7 @@ export default class CCInput extends Component {
             placeholderTextColor={placeholderColor}
             placeholder={placeholder}
             value={value}
+            onSubmitEditing={onSubmitEditing}
             onFocus={this._onFocus}
             onChangeText={this._onChange} />
         </View>

@@ -129,7 +129,7 @@ export default class CreditCardInput extends Component {
 
   render() {
     const {
-      inputContainerStyle, labelStyle, cardLabel, nameLabel, regionLabel, requiresName, requiresPostalCode, requiresCVC
+      inputContainerStyle, labelStyle, cardLabel, nameLabel, regionLabel, requiresName, requiresPostalCode, requiresCVC,
     } = this.props;
 
     return (
@@ -158,6 +158,7 @@ export default class CreditCardInput extends Component {
               }}>
               <View style={{ flex: 1 }}>
                 <CCInput {...this._inputProps("number")}
+                  onSubmitEditing={() => this._focus("expiry")}
                   keyboardType="numeric"
                   containerStyle={[s.inputContainer, inputContainerStyle]} />
               </View>
@@ -170,6 +171,7 @@ export default class CreditCardInput extends Component {
               }}>
               <View style={{ flex: 1 }}>
                 <CCInput {...this._inputProps("expiry")}
+                  onSubmitEditing={ () => this._focus("cvc") }
                   keyboardType="numeric"
                   containerStyle={[s.inputContainer, inputContainerStyle, { borderRightWidth: 1 }]} />
               </View>
@@ -182,6 +184,7 @@ export default class CreditCardInput extends Component {
                 }}>
               <View style={{ flex: 1 }}>
                 <CCInput {...this._inputProps("cvc")}
+                  onSubmitEditing={ () => this._focus("name") }
                   keyboardType="numeric"
                   containerStyle={[s.inputContainer, inputContainerStyle]} />
               </View>
@@ -202,6 +205,7 @@ export default class CreditCardInput extends Component {
               {nameLabel}
             </Text>
             <CCInput {...this._inputProps("name")}
+              onSubmitEditing={ () => this._focus("postalCode") }
               keyboardType="default"
               containerStyle={[s.inputContainer, inputContainerStyle, { borderWidth: 1, borderRadius: 5 }]} />
           </View> }
